@@ -1,20 +1,27 @@
+// App.js
 import React, { useState } from 'react';
+import analyzeImage from './azure-image-analysis';
+import './App.css';
 
 function App() {
-  const [inputValue, setInputValue] = useState(''); // Estado para la URL o el prompt
+  const [inputValue, setInputValue] = useState('');
+  const [analysisResults, setAnalysisResults] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (event) => {
-    setInputValue(event.target.value); // Actualiza el estado con el valor del input
+    setInputValue(event.target.value);
   };
 
-  const handleAnalyzeImage = () => {
-    // Aquí irá la lógica para analizar la imagen
-    console.log('Analyze image with URL:', inputValue);
-  };
-
-  const handleGenerateImage = () => {
-    // Aquí irá la lógica para generar la imagen
-    console.log('Generate image with prompt:', inputValue);
+  const handleAnalyzeClick = async () => {
+    setIsLoading(true);
+    try {
+      const results = await analyzeImage(inputValue);
+      setAnalysisResults(results);
+    } catch (error) {
+      console.error(error);
+      // Aquí manejarías el error, quizás estableciendo un estado de error
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -24,10 +31,24 @@ function App() {
         type="text"
         value={inputValue}
         onChange={handleInputChange}
-        placeholder="Enter image URL or prompt"
+        placeholder="Enter image URL"
       />
-      <button onClick={handleAnalyzeImage}>Analyze Image</button>
-      <button onClick={handleGenerateImage}>Generate Image</button>
+      <button onClick={handleAnalyzeClick} disabled={isLoading}>
+        {isLoading ? 'Analyzing...' : 'Analyze Image'}
+      </button>
+      {analysisResults && <DisplayResults results={analysisResults} imageUrl={inputValue} />}
+    </div>
+  );
+}
+
+function DisplayResults({ results, imageUrl }) {
+  // Aquí formatearías los resultados de la API para mostrarlos en la UI
+  return (
+    <div>
+      <h2>Analysis Results</h2>
+      <img src={imageUrl} alt="Analyzed" />
+      {/* Mostrar los resultados de forma legible aquí */}
+      <pre>{JSON.stringify(results, null, 2)}</pre>
     </div>
   );
 }
