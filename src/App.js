@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './App.css';
 
 function App() {
   const [inputValue, setInputValue] = useState(''); // Estado para la URL o el prompt
